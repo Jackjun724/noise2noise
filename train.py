@@ -30,8 +30,10 @@ def get_args():
                         help="train image dir")
     parser.add_argument("--test_dir", type=str, required=True,
                         help="test image dir")
-    parser.add_argument("--image_size", type=int, default=64,
-                        help="training patch size")
+    parser.add_argument("--image_width", type=int, default=64,
+                        help="training patch width")
+    parser.add_argument("--image_height", type=int, default=64,
+                        help="training patch height")
     parser.add_argument("--batch_size", type=int, default=16,
                         help="batch size")
     parser.add_argument("--nb_epochs", type=int, default=60,
@@ -63,7 +65,8 @@ def main():
     args = get_args()
     image_dir = args.image_dir
     test_dir = args.test_dir
-    image_size = args.image_size
+    image_width = args.image_width
+    image_height = args.image_height
     batch_size = args.batch_size
     nb_epochs = args.nb_epochs
     lr = args.lr
@@ -75,7 +78,7 @@ def main():
     if args.weight is not None:
         model.load_weights(args.weight)
 
-    opt = Adam(lr=lr)
+    opt = Adam(learning_rate=lr)
     callbacks = []
 
     if loss_type == "l0":
@@ -88,7 +91,7 @@ def main():
     target_noise_model = get_noise_model(args.target_noise_model)
     val_noise_model = get_noise_model(args.val_noise_model)
     generator = NoisyImageGenerator(image_dir, source_noise_model, target_noise_model, batch_size=batch_size,
-                                    image_size=image_size)
+                                    image_width=image_width, image_height=image_height)
     val_generator = ValGenerator(test_dir, val_noise_model)
     output_path.mkdir(parents=True, exist_ok=True)
     callbacks.append(LearningRateScheduler(schedule=Schedule(nb_epochs, lr)))

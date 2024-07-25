@@ -2,30 +2,30 @@ from pathlib import Path
 import random
 import numpy as np
 import cv2
-from keras.utils import Sequence
+from tensorflow.keras.utils import Sequence
 
 
 class NoisyImageGenerator(Sequence):
-    def __init__(self, image_dir, source_noise_model, target_noise_model, batch_size=32, image_size=64):
+    def __init__(self, image_dir, source_noise_model, target_noise_model, batch_size=32, image_width=64, image_height=64):
         image_suffixes = (".jpeg", ".jpg", ".png", ".bmp")
         self.image_paths = [p for p in Path(image_dir).glob("**/*") if p.suffix.lower() in image_suffixes]
         self.source_noise_model = source_noise_model
         self.target_noise_model = target_noise_model
         self.image_num = len(self.image_paths)
         self.batch_size = batch_size
-        self.image_size = image_size
+        self.image_width = image_width
+        self.image_height = image_height
 
         if self.image_num == 0:
             raise ValueError("image dir '{}' does not include any image".format(image_dir))
 
     def __len__(self):
-        return self.image_num // self.batch_size
+        return 1000
 
     def __getitem__(self, idx):
         batch_size = self.batch_size
-        image_size = self.image_size
-        x = np.zeros((batch_size, image_size, image_size, 3), dtype=np.uint8)
-        y = np.zeros((batch_size, image_size, image_size, 3), dtype=np.uint8)
+        x = np.zeros((batch_size, self.image_height, self.image_width, 3), dtype=np.uint8)
+        y = np.zeros((batch_size, self.image_height, self.image_width, 3), dtype=np.uint8)
         sample_id = 0
 
         while True:
@@ -34,11 +34,11 @@ class NoisyImageGenerator(Sequence):
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             h, w, _ = image.shape
 
-            if h >= image_size and w >= image_size:
+            if h >= self.image_height and w >= self.image_width:
                 h, w, _ = image.shape
-                i = np.random.randint(h - image_size + 1)
-                j = np.random.randint(w - image_size + 1)
-                clean_patch = image[i:i + image_size, j:j + image_size]
+                i = np.random.randint(h - self.image_height + 1)
+                j = np.random.randint(w - self.image_width + 1)
+                clean_patch = image[i:i + self.image_height, j:j + self.image_width]
                 x[sample_id] = self.source_noise_model(clean_patch)
                 y[sample_id] = self.target_noise_model(clean_patch)
 

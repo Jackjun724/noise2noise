@@ -1,8 +1,8 @@
-from keras import Model
+from tensorflow.keras import Model
 from tensorflow.keras.layers import Input, Add, PReLU, Conv2DTranspose, Concatenate, MaxPooling2D, UpSampling2D, Dropout
 from tensorflow.keras.layers import Conv2D,BatchNormalization
 from tensorflow.keras.callbacks import Callback
-from keras import backend as K
+from tensorflow.keras import backend as K
 import tensorflow as tf
 
 

@@ -53,8 +53,10 @@ def get_noise_model(noise_type="gaussian,0,50"):
 def get_args():
     parser = argparse.ArgumentParser(description="test noise model",
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--image_size", type=int, default=256,
-                        help="training patch size")
+    parser.add_argument("--image_width", type=int, default=64,
+                        help="training patch width")
+    parser.add_argument("--image_height", type=int, default=64,
+                        help="training patch height")
     parser.add_argument("--noise_model", type=str, default="gaussian,0,50",
                         help="noise model to be tested")
     args = parser.parse_args()
@@ -63,11 +65,12 @@ def get_args():
 
 def main():
     args = get_args()
-    image_size = args.image_size
+    image_width = args.image_width
+    image_height = args.image_height
     noise_model = get_noise_model(args.noise_model)
 
     while True:
-        image = np.ones((image_size, image_size, 3), dtype=np.uint8) * 128
+        image = np.ones((image_width, image_height, 3), dtype=np.uint8) * 128
         noisy_image = noise_model(image)
         cv2.imshow("noise image", noisy_image)
         key = cv2.waitKey(-1)
